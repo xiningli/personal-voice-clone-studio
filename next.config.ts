@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 // Dev-only: hosts allowed to load /_next resources besides localhost. Without this the
@@ -11,6 +12,14 @@ const extraOrigins = (process.env.STUDIO_DEV_ORIGINS ?? "")
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost", ...extraOrigins],
+  // This app is a standalone project, not a monorepo, but its two sibling apps
+  // (personal-site, personal-digital-human) each carry their own lockfile one level up
+  // under ~/digital-human. Turbopack's workspace-root inference walks up looking for the
+  // highest ancestor lockfile and picked that shared parent, so `node_modules` resolution
+  // (e.g. tailwindcss) failed against a directory that has none. Pinning the root here to
+  // this project's own directory removes the ambiguity.
+  turbopack: { root: __dirname },
+  outputFileTracingRoot: path.join(__dirname),
   /* config options here */
 };
 
