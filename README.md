@@ -1,8 +1,5 @@
 # Personal Voice Clone Studio
 
-> Repository directory: `personal-voice-clone-studio` (the product's former name). Servers, scripts and
-> notes point at that path, so the directory keeps its name.
-
 Local-first workbench for cloning your own voice with **CosyVoice3** (CosyVoice2 selectable), steering its
 **语气语调** (tone and prosody) with natural-language instructions, and collecting **human
 preference data** over those instructions in a blind-listening arena. The winning

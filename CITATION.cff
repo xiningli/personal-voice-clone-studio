@@ -2,9 +2,13 @@ cff-version: 1.2.0
 message: "If you use this software or its evaluation protocol, please cite it."
 title: "Personal Voice Clone Studio: collect, evaluate and fine-tune a personal voice"
 type: software
-version: 0.2.0
-date-released: "2026-09-15"
-repository-code: "TBD"
+authors:
+  - given-names: Xining
+    family-names: Li
+    alias: xiningli
+version: 0.1.0
+date-released: "2026-09-19"
+repository-code: "https://github.com/xiningli/personal-voice-clone-studio"
 abstract: >
   A local-first workbench that records a phonetically balanced corpus of one speaker with
   automatic quality control, collects blind paired preferences over prosody instructions and
@@ -16,4 +20,4 @@ keywords:
   - voice cloning
   - subjective evaluation
   - preference optimization
-license: TBD
+license: MIT
