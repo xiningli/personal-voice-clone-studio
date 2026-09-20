@@ -1,0 +1,19 @@
+# Self-signed dev certificate for `npm run dev` (HTTPS is required for microphone access).
+# Generic SANs only — to serve the app on your LAN/Tailscale host, copy this file to
+# certs/openssl.local.cnf (git-ignored), add your hostnames/IPs under [alt], and regenerate:
+#   openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+#     -keyout certs/dev-key.pem -out certs/dev-cert.pem -config certs/openssl.local.cnf
+[req]
+distinguished_name = dn
+x509_extensions = ext
+prompt = no
+[dn]
+CN = localhost
+[ext]
+subjectAltName = @alt
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+[alt]
+DNS.1 = localhost
+IP.1 = 127.0.0.1

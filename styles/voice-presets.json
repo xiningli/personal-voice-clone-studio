@@ -1,0 +1,247 @@
+{
+  "presets": [
+    {
+      "id": "neutral-clone",
+      "name": "Neutral (pure clone)",
+      "description": "No instruction. Zero-shot clone that follows the reference clip's own delivery.",
+      "speed": 1.0,
+      "instruct": "",
+      "contentType": "baseline",
+      "language": "any"
+    },
+    {
+      "id": "intro-narration-en",
+      "name": "Intro Narration (EN)",
+      "description": "Warm, welcoming tone for lesson introductions",
+      "speed": 0.95,
+      "instruct": "Speak warmly and enthusiastically, like greeting students at the start of class.",
+      "contentType": "introduction",
+      "language": "en"
+    },
+    {
+      "id": "concept-explanation-en",
+      "name": "Concept Explanation (EN)",
+      "description": "Clear, measured pace for explaining new concepts",
+      "speed": 0.9,
+      "instruct": "Speak clearly and patiently at a measured pace, like carefully explaining a new idea for the first time.",
+      "contentType": "explanation",
+      "language": "en"
+    },
+    {
+      "id": "digital-human-greeting-en",
+      "name": "Digital Human Greeting (EN)",
+      "description": "The avatar welcoming a visitor into the space",
+      "speed": 1.0,
+      "instruct": "Speak in a natural, friendly voice with a hint of a smile, like welcoming a guest who just walked in.",
+      "contentType": "digital-human",
+      "language": "en"
+    },
+    {
+      "id": "quiz-callout-en",
+      "name": "Quiz Callout (EN)",
+      "description": "Engaging tone for quiz questions",
+      "speed": 1.0,
+      "instruct": "Sound playful and a little challenging, like posing a fun question to the class.",
+      "contentType": "quiz",
+      "language": "en"
+    },
+    {
+      "id": "summary-recap-en",
+      "name": "Summary Recap (EN)",
+      "description": "Concise, confident wrap-up",
+      "speed": 1.05,
+      "instruct": "Speak confidently and concisely, wrapping up the key points with energy.",
+      "contentType": "summary",
+      "language": "en"
+    },
+    {
+      "id": "casual-explainer-en",
+      "name": "Casual Explainer (EN)",
+      "description": "Relaxed, conversational delivery",
+      "speed": 1.0,
+      "instruct": "Speak casually and conversationally, like explaining something to a friend.",
+      "contentType": "casual",
+      "language": "en"
+    },
+    {
+      "id": "code-walkthrough-en",
+      "name": "Code Walkthrough (EN)",
+      "description": "Slow, precise, step by step",
+      "speed": 0.85,
+      "instruct": "Speak precisely and steadily, step by step, with a short pause between steps.",
+      "contentType": "code",
+      "language": "en"
+    },
+    {
+      "id": "happy-en",
+      "name": "Happy (EN)",
+      "description": "Bright and cheerful",
+      "speed": 1.0,
+      "instruct": "Say this in a happy, bright voice.",
+      "contentType": "emotion",
+      "language": "en"
+    },
+    {
+      "id": "sad-en",
+      "name": "Sad (EN)",
+      "description": "Low, subdued",
+      "speed": 0.95,
+      "instruct": "Say this in a sad, subdued voice.",
+      "contentType": "emotion",
+      "language": "en"
+    },
+    {
+      "id": "surprised-en",
+      "name": "Surprised (EN)",
+      "description": "Astonished, rising intonation",
+      "speed": 1.0,
+      "instruct": "Say this sounding surprised.",
+      "contentType": "emotion",
+      "language": "en"
+    },
+    {
+      "id": "whisper-en",
+      "name": "Whisper (EN)",
+      "description": "Quiet, intimate",
+      "speed": 0.95,
+      "instruct": "Whisper this softly, in an intimate voice.",
+      "contentType": "emotion",
+      "language": "en"
+    },
+    {
+      "id": "calm-en",
+      "name": "Calm (EN)",
+      "description": "Low, slow, unhurried",
+      "speed": 0.9,
+      "instruct": "Speak calmly and slowly, in a low, unhurried voice.",
+      "contentType": "emotion",
+      "language": "en"
+    },
+    {
+      "id": "digital-human-thinking-en",
+      "name": "Digital Human Thinking Aloud (EN)",
+      "description": "The avatar reasoning through a visitor's question",
+      "speed": 0.95,
+      "instruct": "Speak thoughtfully, as if thinking aloud, a little slower, with natural pauses between sentences.",
+      "contentType": "digital-human",
+      "language": "en"
+    },
+    {
+      "id": "digital-human-answer-en",
+      "name": "Digital Human Answer (EN)",
+      "description": "The avatar answering a visitor",
+      "speed": 1.0,
+      "instruct": "Speak in a clear, friendly, confident voice, like answering a guest's question in person.",
+      "contentType": "digital-human",
+      "language": "en"
+    },
+    {
+      "id": "intro-narration",
+      "name": "Intro Narration",
+      "description": "Warm, welcoming tone for lesson introductions",
+      "speed": 0.95,
+      "instruct": "用温暖、亲切、有热情的语气说这句话，像在课程开始时欢迎学生。",
+      "contentType": "introduction",
+      "language": "zh"
+    },
+    {
+      "id": "concept-explanation",
+      "name": "Concept Explanation",
+      "description": "Clear, measured pace for explaining new concepts",
+      "speed": 0.9,
+      "instruct": "用清晰、耐心、循序渐进的语气讲解，语速稍慢，像第一次给学生讲一个新概念。",
+      "contentType": "explanation",
+      "language": "zh"
+    },
+    {
+      "id": "quiz-callout",
+      "name": "Quiz Callout",
+      "description": "Engaging tone for quiz questions and knowledge checks",
+      "speed": 1.0,
+      "instruct": "用活泼、带一点挑战意味的语气提问，像在课堂上抛出一个有趣的问题。",
+      "contentType": "quiz",
+      "language": "zh"
+    },
+    {
+      "id": "summary-recap",
+      "name": "Summary Recap",
+      "description": "Concise, confident wrap-up",
+      "speed": 1.05,
+      "instruct": "用自信、干脆、有力量的语气总结要点。",
+      "contentType": "summary",
+      "language": "zh"
+    },
+    {
+      "id": "casual-explainer",
+      "name": "Casual Explainer",
+      "description": "Relaxed, conversational delivery",
+      "speed": 1.0,
+      "instruct": "用轻松随意的聊天语气说，像在跟朋友解释一件事。",
+      "contentType": "casual",
+      "language": "zh"
+    },
+    {
+      "id": "code-walkthrough",
+      "name": "Code Walkthrough",
+      "description": "Slow, precise, step by step",
+      "speed": 0.85,
+      "instruct": "用严谨、平稳、一步一步的语气讲解，每个步骤之间稍作停顿。",
+      "contentType": "code",
+      "language": "zh"
+    },
+    {
+      "id": "happy",
+      "name": "Happy",
+      "description": "Bright and cheerful",
+      "speed": 1.0,
+      "instruct": "用开心、明亮的语气说这句话。",
+      "contentType": "emotion",
+      "language": "zh"
+    },
+    {
+      "id": "sad",
+      "name": "Sad",
+      "description": "Low, subdued",
+      "speed": 0.95,
+      "instruct": "用低落、伤感的语气说这句话。",
+      "contentType": "emotion",
+      "language": "zh"
+    },
+    {
+      "id": "surprised",
+      "name": "Surprised",
+      "description": "Astonished, rising intonation",
+      "speed": 1.0,
+      "instruct": "用惊讶的语气说这句话。",
+      "contentType": "emotion",
+      "language": "zh"
+    },
+    {
+      "id": "whisper",
+      "name": "Whisper",
+      "description": "Quiet, intimate",
+      "speed": 0.95,
+      "instruct": "用轻声、亲密的语气小声说这句话。",
+      "contentType": "emotion",
+      "language": "zh"
+    },
+    {
+      "id": "digital-human-greeting",
+      "name": "Digital Human Greeting",
+      "description": "The avatar welcoming a visitor into the space",
+      "speed": 1.0,
+      "instruct": "用自然、友好、稍带笑意的语气说，像在欢迎一位刚走进来的客人。",
+      "contentType": "digital-human",
+      "language": "zh"
+    },
+    {
+      "id": "digital-human-thinking",
+      "name": "Digital Human Thinking Aloud",
+      "description": "The avatar reasoning through a visitor's question",
+      "speed": 0.95,
+      "instruct": "用思考中的、若有所思的语气说，语速稍慢，句间有自然停顿。",
+      "contentType": "digital-human",
+      "language": "zh"
+    }
+  ]
+}

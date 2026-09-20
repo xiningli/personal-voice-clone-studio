@@ -1,0 +1,120 @@
+Listen carefully now, because this is the step where most people slip.
+Swapping the order of these two steps silently corrupts the result.
+Never commit the credentials file, no matter how quick the fix seems.
+Back up the checkpoint before you touch the optimizer state.
+This deadline is firm; submissions after midnight will not be graded.
+Do not run the training script on the shared machine without booking the card first.
+Every experiment must record its seed, or the numbers cannot be reproduced.
+If the validation loss climbs for three epochs, stop the run immediately.
+Unplug the power supply before you open the enclosure.
+Read the whole error message before you change a single line of code.
+Leaking test data into the training set invalidates every result that follows.
+You must document why each sample was removed from the dataset.
+Wear the safety glasses whenever the laser bench is switched on.
+Nobody edits the main branch directly; open a pull request and wait for review.
+Check the units twice, because a mismatch here costs a week of debugging.
+Treat every warning in the build log as an error until you understand it.
+Our demo goes live at nine, so freeze the code tonight and touch nothing tomorrow.
+Verify the label mapping by hand before you trust the accuracy number.
+An untested backup is not a backup; restore one file now and confirm it opens.
+Keep the visitor recordings out of the repository; they are personal data.
+Do not extrapolate beyond the range of the data you actually collected.
+Report the standard deviation alongside every mean, without exception.
+Stop the fan and let the board cool before you reseat the module.
+Missing citations are not a formatting issue; they are a matter of integrity.
+Regulators require a signed consent form for every recorded voice.
+Let me be clear: a passing test suite does not prove the model is correct.
+Sign out of the admin console the moment you finish; leaving it open is not acceptable.
+Fix the flaky test first, because a red pipeline hides every real failure behind it.
+Use the exact library version listed in the lock file, or the results will drift.
+Quarantine the corrupted shard rather than deleting it, so we can audit what happened.
+No one runs inference on the production server while the migration is in progress.
+Understand the loss function before you tune the learning rate.
+Two decimal places are not enough here; keep the full precision until the final table.
+Log every configuration change with a timestamp and your name.
+Rotate the access token today; it has already been exposed in a screenshot.
+Grant reviewers will check whether the claimed baseline matches the cited paper.
+Mount the drive read only while the recovery tool is scanning it.
+Ask before you retrain on someone else's dataset, even if the license looks permissive.
+Doubling the batch size without adjusting the learning rate is a classic mistake.
+Hold the microphone steady; every bump becomes noise in the corpus.
+Your abstract must state the limitation, not bury it in the appendix.
+Do not silence the exception; catch it, log it, and fail loudly.
+Timestamps in the logs are in universal time, so convert before you compare them.
+Lock the lab door when you leave, even for five minutes.
+We will not ship a feature that fails the accessibility check.
+Discard the whole batch if a single vial was left out of the fridge overnight.
+Reject any pull request that lowers coverage without an explanation.
+There is a reason the checklist exists; complete it in order.
+Anyone who bypasses the review process loses write access to the repository.
+The evaluation script must be frozen before the first result is reported.
+Kindly resist the urge to tweak the test set after seeing the numbers.
+Overwriting the raw recordings is irreversible, so work only on copies.
+Speak to the ethics board before you collect a single face image.
+Hardware failures are logged separately; do not mix them with software incidents.
+Clarify the licensing terms before we announce the dataset publicly.
+Prompt injection is a real threat; sanitize every field that reaches the model.
+Failing to escape the query string is how the last outage started.
+Reproduce the bug on a clean machine before you claim it is fixed.
+Measure twice, cut once, and keep the offcuts labeled.
+Our agreement with the school forbids storing student voices for more than a year.
+Zero tolerance for fabricated numbers, even in an internal slide.
+Shut the valve fully; a quarter turn is not closed.
+Budget the compute for the ablation now, or the paper will lack it later.
+Interview transcripts stay encrypted at rest and never leave this building.
+Gradient clipping is not optional for this architecture; enable it before the first run.
+Thermal throttling will corrupt your timing benchmarks, so check the clocks first.
+Present the failure cases with the same prominence as the successes.
+Whoever merges the change owns the incident that follows.
+Escalate to the on-call engineer if the queue depth stays above threshold for ten minutes.
+Justify every hyperparameter in the table, or remove it from the table.
+Exposure to the ultraviolet lamp is limited to thirty seconds per session.
+Freeze the random seed for the held-out split and never change it again.
+Clarity in the method section is a requirement, not a stylistic preference.
+Late data is worse than no data when the decision has already been made.
+Immediately revoke any key that appears in a public repository.
+Keep the ground truth annotations separate from the model predictions at all times.
+Jumping to the largest model before the pipeline works wastes everyone's quota.
+Retract the claim if the replication fails; the correction is part of the record.
+Only signed binaries may run on the classroom machines.
+Guard the interface with a type check, because the callers will not.
+Voltage above five volts will destroy the sensor instantly.
+Question every number that looks too good, especially your own.
+Remember that the visitor cannot see your screen; describe what the avatar is doing.
+Blocking the emergency exit with equipment is prohibited, full stop.
+Withhold the release until the security audit is signed off.
+Extended sessions without a break are how recording quality degrades unnoticed.
+Nothing goes into the paper that cannot be traced to a logged run.
+Confirm the sample rate before you merge audio from two sources.
+Halt the download if the checksum does not match.
+Correct the typo in the label file now, before it propagates to every derived dataset.
+Deleting the old checkpoints frees space, but only after the comparison is complete.
+Mistakes in the consent language cannot be patched after the recordings exist.
+Plan the ablation before you see the main result, not after.
+Under no circumstances share the raw survey responses outside the team.
+Explain the discrepancy between the two runs before you present either one.
+Watch the memory graph during the first epoch; a slow leak will crash the job at hour six.
+Stay within the approved storage quota, or the scheduler will kill the process.
+Name the variable for what it holds, not for what you hope it holds.
+Faulty cables cause more failed demos than faulty code; test them the day before.
+Sleep before the defense; a tired presenter makes avoidable errors.
+Every checkpoint you skip today becomes a week of lost work when the disk fails.
+Read the license before you copy a single line from that repository into ours.
+Nobody touches the production model without a signed review from a second person.
+Freeze the random seed now, or the result you report tomorrow cannot be reproduced.
+Unplug the external drive only after the sync light has stopped blinking completely.
+Label every axis before you show that plot to the committee, without exception.
+Mixing the test set into training is not a shortcut, it is an invalid result.
+Stop the run immediately if the temperature warning appears on the monitor again.
+Report the failure the same day it happens, not after you have found a fix.
+Version the data exactly as carefully as you version the code, or the numbers mean nothing.
+Ask before deleting anything from the shared folder, even files that look abandoned.
+Confirm the units on that column twice, because a silent mismatch will poison the average.
+Log the exact command line for each run, or the comparison table is worthless.
+Treat any accuracy above ninety-nine percent as a bug until you have proven otherwise.
+Sign out of the cluster when you leave, because idle sessions block everyone else.
+Under no circumstances should the private recordings leave this machine.
+Double check the batch size before submitting, since the last job crashed for that reason.
+Hold the release until every listed test passes, not merely the convenient ones.
+Assume the demo network will fail and rehearse the offline version tonight.
+Write down the threshold you chose and why, because reviewers will ask exactly that.

@@ -1,0 +1,120 @@
+So here is a question for you: what happens if we double the learning rate?
+Why does the loss go down while the accuracy stays perfectly flat?
+Which fix would you try first if the model started producing nonsense after ten steps?
+Can you guess which of these two runs used the smaller batch size?
+Does more data always help, or is there a point where it hurts?
+I wonder whether the attention heads are really looking at punctuation.
+How does the avatar decide when a visitor has finished speaking?
+Which layer do you think learns the difference between a question and a statement?
+Is it the tokenizer, or the data, that makes the model stumble on names?
+Have you ever noticed how the tiny models make oddly confident mistakes?
+Suppose we trained on whispers only; would it still learn to speak out loud?
+Could a single misplaced comma really change the whole prediction?
+Where does the extra echo come from when the instruction asks for excitement?
+Hmm, why would the same seed give two slightly different waveforms?
+Suppose we drop half the vocabulary; how much of the meaning survives?
+Who first noticed that the gradient vanishes in the deeper layers?
+Would a visitor even hear the difference between these two checkpoints?
+Isn't it strange that the smaller model beat the larger one on this task?
+Let me ask you this: what is the model actually doing during the silence?
+Do you think the warm profile would still sound warm reading a recipe?
+Tell me, how many sentences does a voice need before it starts to sound like a person?
+Might the room echo be teaching the model something we never intended?
+Are the pauses in my speech carrying more information than the words?
+Curious: does the sad instruction lower the pitch, or just slow everything down?
+What exactly changes in the spectrogram when I smile while speaking?
+Okay, but why did the validation loss jump precisely at epoch seven?
+Should we be surprised that the listener preferred the plainer voice?
+Out of the whole bank, which sentence do you think is hardest to pronounce?
+If the corpus doubled overnight, which metric would move first?
+Any idea why the whisper model hears "we will" when I clearly say "we'll"?
+How much of a voice is timbre, and how much is the rhythm of the phrases?
+Was it the seed, the data, or the learning rate that made the difference?
+Wait, does the flow model even see the emotion tag during training?
+Perhaps the anchor trial will tell us whether I can recognize my own voice.
+Whose idea was it to measure reverb from the tail after the last word?
+Given only three seconds of speech, how well could you guess the speaker's mood?
+Shouldn't a bigger reference clip make the clone more stable, not less?
+Imagine the visitor asks something the avatar has never heard; what happens then?
+Is there a way to hear the learning rate, if we listened to the outputs epoch by epoch?
+What does the model think a laugh sounds like, if it has never heard one?
+Between two nearly identical takes, what makes one feel more natural?
+Really, how does a pile of matrices end up with an accent?
+Notice anything odd about the way it pronounces the word "data"?
+Ever wondered what the speaker embedding would say about a whisper?
+Hey, could we sort the whole bank by how tired my voice sounds?
+Just how many preference votes does it take before the ranking stops flipping?
+Anyone care to bet on whether the borderline takes help or hurt?
+Might the calm sentences be teaching the model to slow down everywhere?
+Wonder what the avatar would answer if a guest asked it to sing.
+Yet why does the English clone sound more like me than the Chinese one?
+Say the loss curve suddenly flattens; is that convergence, or a bug in the logger?
+Does anyone know why the first token is always the slowest to generate?
+Could the microphone placement alone explain the difference in similarity scores?
+Do the quiet takes fail because of noise, or because I was simply far away?
+Assuming we fix the echo, what is the next thing that will sound wrong?
+Where in the network does the speaker identity actually live?
+Odd, isn't it, that the model pauses in places where I never pause?
+Interesting; the surprised instruction raised the pitch but shortened the vowels, why?
+Since the tokens are discrete, where does the smoothness of the voice come from?
+Am I imagining it, or does the model breathe differently in the sad profile?
+Seriously though, how would you explain attention to a curious ten-year-old?
+Then again, maybe the answer is hiding in the held-out set we never listen to?
+What would a linguist notice in these outputs that we keep missing?
+Look at that spike; what on earth happened at step four hundred?
+Hmm, which of the two candidates would you say sounds more awake?
+Try guessing: which emotion has the widest pitch range in my recordings?
+Before we test it, what do you expect the whisper instruction to do to the consonants?
+Twenty sentences in, do you hear the voice getting more consistent, or less?
+Funny, why does reading questions aloud make my pitch rise even when I plan it not to?
+Right, but if the seed is fixed, where does the remaining randomness come from?
+Let's find out whether the avatar can tell a greeting from a question.
+Maybe the answer depends on whether the visitor is standing close or far away?
+Care to guess how long the model would need to learn my laugh?
+Somehow the third run is better on every metric; what did we change without noticing?
+Now that the corpus has grown, will the old prompt still win in the arena?
+Puzzling: the objective scores agree, yet my ears prefer the other one, why?
+Consider this: could we trade half the parameters for better data and lose nothing?
+How come the pure clone sounds more like me but the instructed one sounds more alive?
+Which comes first in learning a voice, the vowels or the rhythm?
+Did the borderline takes change the ranking, or just the confidence intervals?
+Ah, but what if the echo we hear is actually in the training data of the base model?
+Is the digital human more convincing when it hesitates a little?
+Well, would you rather have ten clean minutes or thirty borderline ones?
+Guess what the speaker similarity was between me and my own recording?
+Honestly, what makes a synthetic pause feel natural?
+Because the flow model is trained separately, does it even know which emotion it is rendering?
+Curious whether a listener could pick my real recording out of a lineup of clones.
+Under what conditions would a smaller learning rate actually speed up training?
+Quick one: what does the model output if the reference clip is pure silence?
+Very roughly, how many words does a phonetically balanced English set need?
+Kind of makes you wonder what the model dreams about during a long training run.
+Zero errors on the test set; are we brilliant, or did the labels leak?
+Every so often the avatar chooses a strange word; where does that come from?
+Only one candidate got the emphasis right, so what was different about its seed?
+Beyond pitch and speed, what else does an instruction actually control?
+Lately I keep asking: is expressiveness a property of the model or of the prompt?
+Unless I am mistaken, the warm profile was recorded closest to the microphone, right?
+Nobody has explained why the reverb estimate changes when the level changes; any theories?
+Jokes aside, could a language model learn timing from written punctuation alone?
+Exactly how far can we push the speed before the words start to blur?
+Why would the loss plateau for an hour and then suddenly drop without warning?
+Have you ever wondered whether the model actually reads the punctuation at all?
+Isn't it strange that the tiny run generalizes better than the big one?
+Can anyone explain why the attention heads in layer three all look identical?
+Would a different tokenizer change the accent of the synthesized voice, do you think?
+Are the visitors asking the avatar the same questions they would ask me in person?
+Should we be surprised that shuffling the labels still gives above chance accuracy?
+Was that improvement real, or did we just get lucky with the seed?
+Wouldn't it be interesting to train only on the sentences the model gets wrong?
+Doesn't the shape of that curve remind you of the overfitting example from week two?
+Had we normalized the audio first, would the speaker similarity score have moved?
+Any guesses about which feature the classifier is secretly relying on?
+Curiously, the error rate falls when we add noise; what could explain that?
+Before we look at the answer, which of these two runs do you think used dropout?
+Between the two schedules, why does the slower warmup end up faster overall?
+Somewhere in this dataset there must be duplicates; how would you find them quickly?
+After all these experiments, do we actually know what the embedding encodes?
+Imagine we removed the residual connections entirely; how deep could the network still train?
+Perhaps the odd samples cluster together; would a quick projection show us?
+Given that the loss is identical, why do the two models sound so different?
