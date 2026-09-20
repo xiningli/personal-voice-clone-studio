@@ -189,7 +189,15 @@ class Engine:
                 except Exception:
                     LOG.info("weights for %s not cached; downloading", self.model_id)
                     model_dir = snapshot_download(self.model_id)
-            cls = CosyVoice3 if is_cv3(self.model_id, model_dir) else CosyVoice2
+            # Decide CosyVoice3 from the resolved directory, not from the id string, and publish
+            # it: a fine-tuned checkpoint lives at a path like models/owner-sft-v2, which does not
+            # contain "CosyVoice3", so the module-level guess made at import time is wrong whenever
+            # STUDIO_TTS_MODEL points straight at a checkpoint. Without this, synthesis drops the
+            # "You are a helpful assistant." prefix below, and CosyVoice3 then speaks the
+            # instruction aloud instead of obeying it (and zero-shot emits almost no tokens).
+            global IS_CV3
+            IS_CV3 = is_cv3(self.model_id, model_dir)
+            cls = CosyVoice3 if IS_CV3 else CosyVoice2
             cuda = torch.cuda.is_available()
             if cuda:
                 torch.cuda.reset_peak_memory_stats()
