@@ -112,6 +112,30 @@ Import an already-prepared reference clip as a profile (defaults read
 bash scripts/import-reference.sh <prompt.wav> <prompt.txt>
 ```
 
+## Run with Docker
+
+```bash
+docker compose build
+docker compose up -d
+curl http://localhost:8010/health          # backend, CPU by default
+curl -X POST http://localhost:8010/v1/load # first call downloads the ~3.3 GiB model
+open http://localhost:3010                 # web app (plain HTTP; see the note below)
+```
+
+Two images, built and verified independently: `backend/Dockerfile` (self-contained — clones
+its own CosyVoice checkout at build time, installs the pinned serving-only dependency set
+from `backend/export.py`, no sibling checkout needed) and `Dockerfile` (the Next.js app, a
+standard build-then-run multi-stage image). `docker-compose.yml` wires the app to the
+backend over the compose network (`TTS_ENDPOINT=http://backend:8010`) and gives each named
+volumes so models, corpus data and votes survive `docker compose down`.
+
+CPU by default (`STUDIO_FORCE_CPU=1`) so a clone with no GPU still works end to end; on a
+CUDA host, set it to `0` and uncomment the `deploy.resources.reservations.devices` block in
+`docker-compose.yml` (needs the NVIDIA Container Toolkit). `next start` (what the web
+container runs) has no `--experimental-https`, so the browser only exposes the microphone
+through it from `localhost` or behind your own TLS-terminating proxy — the dev server's
+self-signed cert is a local-dev-only convenience, not meant for the container.
+
 ## Feeding a digital human
 
 `GET /api/arena/export/digital-human` returns, per profile, the prompt wav path, its

@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8010:8010"
+    environment:
+      # CPU by default for a portable "clone and run" experience; set to 0 and add a GPU
+      # reservation (see the commented block below) on a CUDA-capable host.
+      - STUDIO_FORCE_CPU=1
+      - STUDIO_TTS_PRELOAD=0
+    volumes:
+      # Model downloads and any exported bundles persist across `docker compose down`.
+      - hf-cache:/app/.cache/huggingface
+      - studio-models:/app/models
+      - studio-exports:/app/exports
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3010:3010"
+    environment:
+      - TTS_ENDPOINT=http://backend:8010
+    volumes:
+      # Reference recordings, generated audio and votes: personal data, never baked into the
+      # image; this is the git-ignored data/ the app already writes to.
+      - studio-data:/app/data
+      - studio-audio:/app/public/audio
+    depends_on:
+      - backend
+
+volumes:
+  hf-cache:
+  studio-models:
+  studio-exports:
+  studio-data:
+  studio-audio:

@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+certs/*.pem
+data
+datasets
+models
+exports
+public/audio/uploads
+public/audio/generated
+public/audio/arena
+.venv
+*.log
+.env*
+scripts/local-env.sh
