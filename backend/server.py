@@ -3,6 +3,7 @@
 Serves the Next.js app on http://127.0.0.1:8010 (8000 is taken on this machine):
 
     POST /v1/tts      text + reference prompt (+ instruct, speed, seed, mode) -> wav
+    POST /v1/tts/stream  same body -> raw 16-bit PCM, streamed chunk by chunk as it is synthesized
     POST /v1/prepare  any recording -> clean 24 kHz prompt wav + whisper transcript
     GET  /health      model / GPU status
     POST /v1/unload   free the GPU (the digital-human backend shares the card)
@@ -19,6 +20,12 @@ Modes (chosen by `mode`, default "auto"):
 
 The CosyVoice checkout and the venv default to this repo's .venv and models/CosyVoice;
 override with STUDIO_PYTHON / STUDIO_COSYVOICE_REPO / STUDIO_TTS_MODEL.
+
+Inference acceleration (CUDA only, each off by default; see accel_kwargs):
+    STUDIO_TTS_TRT=1    flow decoder estimator as a TensorRT engine
+    STUDIO_TTS_VLLM=1   speech-token LM served by vLLM
+    STUDIO_TTS_JIT=1    TorchScript flow encoder (CosyVoice2 only)
+    STUDIO_TTS_STREAM_POLL_S=0.02   poll CosyVoice's stream loop faster than its 0.1 s
 Reference audio and everything synthesized from it stay on this machine; nothing is logged
 beyond timings and text lengths.
 """
@@ -41,7 +48,7 @@ from typing import Literal, Optional
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -81,6 +88,68 @@ SAMPLE_RATE = 24_000
 DENOISE = "highpass=f=70,afftdn=nf=-20:tn=1,loudnorm=I=-18:TP=-1.5:LRA=11"
 
 Mode = Literal["auto", "zero_shot", "instruct", "instruct_ref", "cross_lingual"]
+
+# Acceleration is opt-in because each option changes what the first load costs and writes
+# build artefacts into the model directory:
+#   TRT   builds flow.decoder.estimator.fp16.mygpu.plan from flow.decoder.estimator.fp32.onnx
+#         on first load (minutes). The plan is specific to the GPU it was built on, so a marker
+#         next to it records the device and a plan from another card is rebuilt.
+#   VLLM  exports the LM into <model_dir>/vllm on first load and serves it from vLLM, which
+#         reserves 20% of the card (CosyVoice's own gpu_memory_utilization).
+#   JIT   only CosyVoice2 has the TorchScript flow encoder.
+# A fine-tuned checkpoint here only changes llm.pt (train.py trains the LLM stage), so the
+# base model's flow ONNX is the right source for the TensorRT engine.
+ACCEL_TRT = os.environ.get("STUDIO_TTS_TRT", "0") == "1"
+ACCEL_VLLM = os.environ.get("STUDIO_TTS_VLLM", "0") == "1"
+ACCEL_JIT = os.environ.get("STUDIO_TTS_JIT", "0") == "1"
+TRT_CONCURRENT = int(os.environ.get("STUDIO_TTS_TRT_CONCURRENT", "1"))
+TRT_PLAN = "flow.decoder.estimator.fp16.mygpu.plan"
+# Streaming knobs. CosyVoice2/3Model.tts doubles self.token_hop_len after every streamed chunk
+# (up to token_max_hop_len) and never resets it, so after the first streamed call every later
+# one waits for 4x as many tokens before its first chunk; the studio resets it per call. The
+# generator also polls with time.sleep(0.1) between chunks; STUDIO_TTS_STREAM_POLL_S shortens it.
+STREAM_POLL_S = float(os.environ.get("STUDIO_TTS_STREAM_POLL_S", "0.1"))
+
+
+def accel_kwargs(cv3: bool, cuda: bool, model_dir: str) -> dict:
+    """Keyword arguments for CosyVoice2/3 that switch on the requested accelerations."""
+    if not cuda:
+        return {}
+    kwargs: dict = {}
+    if ACCEL_TRT:
+        kwargs["load_trt"] = True
+        kwargs["trt_concurrent"] = TRT_CONCURRENT
+        drop_foreign_trt_plan(model_dir)
+    if ACCEL_VLLM:
+        kwargs["load_vllm"] = True
+    if ACCEL_JIT and not cv3:
+        kwargs["load_jit"] = True
+    return kwargs
+
+
+def patch_stream_poll(seconds: float) -> None:
+    """Make CosyVoice's streaming loop poll every `seconds` instead of 0.1 s."""
+    import time as real_time
+    import types
+
+    from cosyvoice.cli import model as cv_model
+
+    cv_model.time = types.SimpleNamespace(**{k: getattr(real_time, k) for k in dir(real_time) if not k.startswith("_")})
+    cv_model.time.sleep = lambda s: real_time.sleep(min(s, seconds))
+    LOG.info("CosyVoice streaming poll set to %.3fs", seconds)
+
+
+def drop_foreign_trt_plan(model_dir: str) -> None:
+    """Delete a TensorRT plan built on a different GPU so CosyVoice rebuilds it here."""
+    import torch
+
+    plan = Path(model_dir) / TRT_PLAN
+    marker = plan.with_name(plan.name + ".gpu")
+    device = torch.cuda.get_device_name(0)
+    if plan.exists() and (not marker.exists() or marker.read_text().strip() != device):
+        LOG.warning("TensorRT plan %s was not built on %s; rebuilding", plan.name, device)
+        plan.unlink()
+    marker.write_text(device + "\n")
 
 
 def full_length_decode_mask(module) -> None:
@@ -156,6 +225,8 @@ class Engine:
         self.instruct_inputs: dict[tuple[str, str], dict] = {}
         self.model_id = MODEL_ID
         self.model_dir: Optional[str] = None
+        self.accel: dict = {}
+        self.base_hop = 25
 
     # ---- lifecycle ----
     @property
@@ -205,7 +276,12 @@ class Engine:
                 # An exported bundle on a machine without a usable GPU: every core helps.
                 torch.set_num_threads(max(1, os.cpu_count() or 1))
                 LOG.warning("no CUDA device: running on the CPU with %d threads (slow)", torch.get_num_threads())
-            model = cls(model_dir, fp16=cuda)
+            accel = accel_kwargs(IS_CV3, cuda, model_dir)
+            model = cls(model_dir, fp16=cuda, **accel)
+            self.accel = {k: v for k, v in accel.items() if k.startswith("load_")}
+            self.base_hop = model.model.token_hop_len   # 25 for CosyVoice2/3; restored before each streamed call
+            if STREAM_POLL_S != 0.1:
+                patch_stream_poll(STREAM_POLL_S)
             if DEVICE == "mps" and not cuda and torch.backends.mps.is_available():
                 # Mirror the CUDA path: the LM and the flow model in fp16 on Metal (a fine-tuned
                 # checkpoint that speaks in fp16 was found to babble in fp32), the vocoder on the
@@ -303,10 +379,7 @@ class Engine:
         return base
 
     # ---- synthesis ----
-    def synthesize(self, text: str, wav: Path, prompt_text: str, instruct: str, mode: Mode,
-                   speed: float, seed: int) -> tuple[np.ndarray, str]:
-        import torch
-
+    def _check_mode(self, mode: Mode, prompt_text: str, instruct: str) -> Mode:
         if mode == "auto":
             mode = "instruct" if instruct.strip() else ("zero_shot" if prompt_text.strip() else "cross_lingual")
         if mode == "zero_shot" and not prompt_text.strip():
@@ -315,42 +388,72 @@ class Engine:
             raise HTTPException(400, f"{mode} mode needs a non-empty instruct string")
         if mode == "instruct_ref" and not prompt_text.strip():
             raise HTTPException(400, "instruct_ref mode needs prompt_text (the transcript of the reference clip)")
+        return mode
 
-        with self.lock:
-            if self.model is None:
-                raise HTTPException(503, "model not loaded")
-            model = self.model
-            frontend = model.frontend
-            set_seed(seed)
-            # cross_lingual and instruct never feed the transcript to the LM, so key the
-            # speaker on an empty transcript there: one cached prompt serves both.
-            # CosyVoice3 expects "You are a helpful assistant.<|endofprompt|>" before the
-            # reference transcript (zero-shot) or before the text itself (cross-lingual).
-            spk_prompt = prompt_text.strip() if mode == "zero_shot" else ""
-            if IS_CV3 and mode == "zero_shot":
-                spk_prompt = f"{CV3_SYSTEM}<|endofprompt|>{spk_prompt}"
-            spk = self.speaker_id(wav, spk_prompt)
-            pieces: list[torch.Tensor] = []
-            if mode == "zero_shot":
-                outputs = model.inference_zero_shot(text, "", str(wav), zero_shot_spk_id=spk, stream=False, speed=speed)
-                for out in outputs:
-                    pieces.append(out["tts_speech"])
-            elif mode == "cross_lingual":
-                cl_text = f"{CV3_SYSTEM}<|endofprompt|>{text}" if IS_CV3 else text
-                outputs = model.inference_cross_lingual(cl_text, str(wav), zero_shot_spk_id=spk, stream=False, speed=speed)
-                for out in outputs:
-                    pieces.append(out["tts_speech"])
-            else:
-                base = self._instruct_base(spk, instruct.strip(), prompt_text, keep_ref=mode == "instruct_ref")
+    def _chunks(self, text: str, wav: Path, prompt_text: str, instruct: str, mode: Mode,
+                speed: float, stream: bool):
+        """Yield speech tensors as CosyVoice produces them. Call with self.lock held.
+
+        With stream=False each yield is one whole text segment; with stream=True the LM's
+        speech tokens are turned into audio every token_hop_len tokens, so the first yield
+        arrives long before the segment is finished.
+        """
+        model = self.model
+        frontend = model.frontend
+        if stream:
+            model.model.token_hop_len = self.base_hop   # undo CosyVoice's growth from the previous call
+        # cross_lingual and instruct never feed the transcript to the LM, so key the
+        # speaker on an empty transcript there: one cached prompt serves both.
+        # CosyVoice3 expects "You are a helpful assistant.<|endofprompt|>" before the
+        # reference transcript (zero-shot) or before the text itself (cross-lingual).
+        spk_prompt = prompt_text.strip() if mode == "zero_shot" else ""
+        if IS_CV3 and mode == "zero_shot":
+            spk_prompt = f"{CV3_SYSTEM}<|endofprompt|>{spk_prompt}"
+        spk = self.speaker_id(wav, spk_prompt)
+        if mode == "zero_shot":
+            outputs = model.inference_zero_shot(text, "", str(wav), zero_shot_spk_id=spk, stream=stream, speed=speed)
+        elif mode == "cross_lingual":
+            cl_text = f"{CV3_SYSTEM}<|endofprompt|>{text}" if IS_CV3 else text
+            outputs = model.inference_cross_lingual(cl_text, str(wav), zero_shot_spk_id=spk, stream=stream, speed=speed)
+        else:
+            base = self._instruct_base(spk, instruct.strip(), prompt_text, keep_ref=mode == "instruct_ref")
+
+            def instruct_outputs():
                 for segment in frontend.text_normalize(text, split=True):
                     model_input = {**base}
                     model_input["text"], model_input["text_len"] = frontend._extract_text_token(segment)
-                    for out in model.model.tts(**model_input, stream=False, speed=speed):
-                        pieces.append(out["tts_speech"])
+                    yield from model.model.tts(**model_input, stream=stream, speed=speed)
+
+            outputs = instruct_outputs()
+        for out in outputs:
+            yield out["tts_speech"]
+
+    def synthesize(self, text: str, wav: Path, prompt_text: str, instruct: str, mode: Mode,
+                   speed: float, seed: int) -> tuple[np.ndarray, str]:
+        import torch
+
+        mode = self._check_mode(mode, prompt_text, instruct)
+        with self.lock:
+            if self.model is None:
+                raise HTTPException(503, "model not loaded")
+            set_seed(seed)
+            pieces = list(self._chunks(text, wav, prompt_text, instruct, mode, speed, stream=False))
         if not pieces:
             raise HTTPException(500, "the model produced no audio")
         speech = torch.cat(pieces, dim=1).squeeze(0).clamp(-1.0, 1.0)
         return speech.float().cpu().numpy(), mode
+
+    def synthesize_stream(self, text: str, wav: Path, prompt_text: str, instruct: str, mode: Mode,
+                          seed: int):
+        """Yield float32 numpy chunks as soon as each is synthesized (speed is fixed at 1.0:
+        CosyVoice changes speed by resampling the whole mel, which streaming cannot do)."""
+        mode = self._check_mode(mode, prompt_text, instruct)
+        with self.lock:
+            if self.model is None:
+                raise HTTPException(503, "model not loaded")
+            set_seed(seed)
+            for piece in self._chunks(text, wav, prompt_text, instruct, mode, 1.0, stream=True):
+                yield piece.squeeze(0).clamp(-1.0, 1.0).float().cpu().numpy()
 
     @property
     def sample_rate(self) -> int:
@@ -406,6 +509,7 @@ def health():
         "load_seconds": engine.load_seconds,
         "cosyvoice_repo": str(COSYVOICE_REPO),
         "cached_speakers": len(engine.speakers),
+        "accel": engine.accel,
         "port": PORT,
     }
     try:
@@ -470,6 +574,45 @@ def tts(req: TTSRequest):
             "x-trimmed-ms": str(trimmed_ms),
         },
     )
+
+
+@app.post("/v1/tts/stream")
+def tts_stream(req: TTSRequest):
+    """Raw mono 16-bit PCM at x-sample-rate, sent chunk by chunk while CosyVoice is still
+    synthesizing the rest. No breath trim (it needs the whole take) and speed must be 1.0."""
+    wav = Path(req.reference_audio)
+    if not wav.is_file():
+        raise HTTPException(400, f"reference audio not found: {wav}")
+    if req.speed != 1.0:
+        raise HTTPException(400, "streaming synthesis only supports speed 1.0")
+    mode = engine._check_mode(req.mode, req.prompt_text, req.instruct)  # fail before the first byte
+    if not engine.ready:
+        engine.load()
+        if not engine.ready:
+            raise HTTPException(503, engine.error or "model failed to load")
+    seed = req.seed if req.seed is not None else random.randint(0, 2**31 - 1)
+    sr = engine.sample_rate
+
+    def body():
+        started = time.monotonic()
+        first = None
+        samples = 0
+        for chunk in engine.synthesize_stream(req.text, wav, req.prompt_text, req.instruct, mode, seed):
+            if first is None:
+                first = time.monotonic() - started
+            samples += len(chunk)
+            yield np.clip(chunk * 32767, -32768, 32767).astype("<i2").tobytes()
+        elapsed = time.monotonic() - started
+        LOG.info("tts/stream mode=%s chars=%d seed=%d -> %.2fs audio, first chunk %.3fs, total %.2fs",
+                 mode, len(req.text), seed, samples / sr, first or 0.0, elapsed)
+
+    return StreamingResponse(body(), media_type="application/octet-stream", headers={
+        "x-model": engine.model_id,
+        "x-sample-rate": str(sr),
+        "x-sample-format": "s16le",
+        "x-seed": str(seed),
+        "x-mode": mode,
+    })
 
 
 # ---- reference preparation ----
